@@ -29,6 +29,7 @@
 #include <errno.h>
 #include <string.h>
 #include <signal.h>
+#include <stdint.h>
 
 #define MAX_NUM_ARGUMENTS 3
 
@@ -39,12 +40,17 @@
 
 #define MAX_COMMAND_SIZE 255    // The maximum command-line size
 
-
 int main()
 {
   // Variables used in the program 
   int is_the_file_open= 0; // 1 means file exists
   FILE *fptr;
+  
+  // This are for bios parameter block (BPB)
+  uint8_t BPB_BytesPerSec; // Count of bytes per sector
+  uint8_t BPB_SecPerClus; // No. of sectors per allocation 
+  uint16_t BPB_NumFATs; // Count of FAT data strucutre in volume 
+  u_int8_t BPB_FATz32;  // FAT32 32-bit count of sectors occupied by One FAT
 
   char * cmd_str = (char*) malloc( MAX_COMMAND_SIZE );
 
@@ -106,7 +112,7 @@ int main()
       return 0;
     }
     // open <File type> 
-    else if (strcmp(token[0],"open") == 0){
+    else if (strcmp(token[0],"open")==0){
       if (is_the_file_open == 0){
           fptr = fopen(token[1],"r"); // Openig the file to read, 1 means file exists 
           if(fptr == NULL){
@@ -126,6 +132,26 @@ int main()
         printf("Error: File system not open. \n");
       }
       fclose(fptr);
+    }
+    
+    else if (strcmp(token[0],"bpb")==0){
+      if (is_the_file_open == 0){
+        printf("Error: File system not open \n");
+      }
+      else{
+        // The details are taken from the hardware white paper 
+        fseek(fptr,11,SEEK_SET);
+        fread((&BPB_BytesPerSec),2,1,fptr);
+        fseek(fptr,13,SEEK_SET);
+        fread((&BPB_SecPerClus),1,1,fptr);
+        fseek(fptr,16,SEEK_SET);
+        fread((&BPB_NumFATs),1,1,fptr);
+        fseek(fptr,36,SEEK_SET);
+        fread((&BPB_FATz32),4,1,fptr);
+
+        // Printing out the detials
+        printf("Bytes per sectore (BPB_BytesPerSec) : %d %x \n",BPB_BytesPerSec, BPB_BytesPerSec);
+      }
     }
 
   }
