@@ -43,7 +43,7 @@
 int main()
 {
   // Variables used in the program 
-  int is_the_file_open= 0; // 1 means file exists
+  int is_the_file_open= 0; // 1 means file is open
   FILE *fptr;
   
   // This are for bios parameter block (BPB)
@@ -119,7 +119,7 @@ int main()
             printf("Error: File system not found. \n");
           }
           else{
-            is_the_file_open == 1; // 1 means true
+            is_the_file_open = 1; // 1 means true
           }
       } 
       else{
@@ -131,6 +131,7 @@ int main()
       if(is_the_file_open == 0){
         printf("Error: File system not open. \n");
       }
+      is_the_file_open = 0; // Changing this as the file is already close
       fclose(fptr);
     }
     
@@ -149,8 +150,11 @@ int main()
         fseek(fptr,36,SEEK_SET);
         fread((&BPB_FATz32),4,1,fptr);
 
-        // Printing out the detials
-        printf("Bytes per sectore (BPB_BytesPerSec) : %d %x \n",BPB_BytesPerSec, BPB_BytesPerSec);
+        // Printing out the details [int and hexadecimal values]
+        printf("Bytes per sector (BPB_BytesPerSec) : %d %x \n",BPB_BytesPerSec, BPB_BytesPerSec);
+        printf("No of sctors per allocation (BPB_SecPerClus) : %d %x \n",BPB_SecPerClus, BPB_SecPerClus);
+        printf("Count of FAT data structure on the volume (BPB_NumFATs) : %d %x \n",BPB_NumFATs, BPB_NumFATs);
+        printf("Bit-count of sectors occupied by one fat (BPB_FATz32) : %d %x \n",BPB_FATz32, BPB_FATz32);
       }
     }
 
