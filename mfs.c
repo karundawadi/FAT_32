@@ -152,7 +152,7 @@ int main()
 
         // Printing out the details [int and hexadecimal values]
         printf("Bytes per sector (BPB_BytesPerSec) : %d %x \n",BPB_BytesPerSec, BPB_BytesPerSec);
-        printf("No of sctors per allocation (BPB_SecPerClus) : %d %x \n",BPB_SecPerClus, BPB_SecPerClus);
+        printf("No of sectors per allocation (BPB_SecPerClus) : %d %x \n",BPB_SecPerClus, BPB_SecPerClus);
         printf("Count of FAT data structure on the volume (BPB_NumFATs) : %d %x \n",BPB_NumFATs, BPB_NumFATs);
         printf("Bit-count of sectors occupied by one fat (BPB_FATz32) : %d %x \n",BPB_FATz32, BPB_FATz32);
       }
