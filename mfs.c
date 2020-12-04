@@ -158,6 +158,10 @@ int main()
       }
     }
 
-  }
+    else if (strcmp(token[0],"stat")==0){
+      // Filaname or directory name is token[1]
+      
+    }
+  } 
   return 0;
 }
