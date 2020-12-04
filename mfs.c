@@ -42,6 +42,9 @@
 
 int main()
 {
+  // Variables used in the program 
+  int is_the_file_open= 0;
+  FILE *fptr;
 
   char * cmd_str = (char*) malloc( MAX_COMMAND_SIZE );
 
@@ -95,6 +98,30 @@ int main()
     }
 
     free( working_root );
+
+    // At this point token[0] and token[1] and so on has the details about the user input 
+
+    // If the user enters exit or quit then we quit the program 
+    if ((strcmp(token[0],"quit") == 0) || (strcmp(token[0],"exit") == 0)){
+      return 0;
+    }
+    // open <File type> 
+    else if (strcmp(token[0],"open") == 0){
+      if (is_the_file_open == 0){
+          fptr = fopen(token[1],"r"); // Openig the file to read 
+          if(fptr == NULL){
+            printf("Error: File system not found. \n");
+          }
+          else{
+            is_the_file_open == 1; // 1 means true
+          }
+      } 
+      else{
+        printf("Error: File system image already open. \n");
+      }
+    }
+    
+    else if 
 
   }
   return 0;
