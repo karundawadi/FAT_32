@@ -43,7 +43,7 @@
 int main()
 {
   // Variables used in the program 
-  int is_the_file_open= 0;
+  int is_the_file_open= 0; // 1 means file exists
   FILE *fptr;
 
   char * cmd_str = (char*) malloc( MAX_COMMAND_SIZE );
@@ -108,7 +108,7 @@ int main()
     // open <File type> 
     else if (strcmp(token[0],"open") == 0){
       if (is_the_file_open == 0){
-          fptr = fopen(token[1],"r"); // Openig the file to read 
+          fptr = fopen(token[1],"r"); // Openig the file to read, 1 means file exists 
           if(fptr == NULL){
             printf("Error: File system not found. \n");
           }
@@ -121,7 +121,12 @@ int main()
       }
     }
     
-    else if 
+    else if (strcmp(token[0],"close")==0){
+      if(is_the_file_open == 0){
+        printf("Error: File system not open. \n");
+      }
+      fclose(fptr);
+    }
 
   }
   return 0;
