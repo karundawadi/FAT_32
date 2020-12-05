@@ -285,7 +285,22 @@ int main()
       if(is_the_file_open == 0){
         printf("Error: File system image must be opened first. \n");
       }else{
-
+        uint16_t ClusterLow;
+        int i;
+          for (i=0; i<16; i++)
+          {
+            //compares input with directory name
+            //this gets executed, when cd foo.txt is entered
+            if(compare_Name( token[1], dir[i].DIR_NAME))
+            {
+              ClusterLow = dir[i].DIR_FirstCLusterLow;
+              if( ClusterLow == 0 ) ClusterLow = 2;
+              printf("Moving to cluster %d\n", ClusterLow);
+              fseek(fptr, LABToOffset( ClusterLow,BPB_BytesPerSec,BPB_RsvdSecCnt,BPB_NumFATs,BPB_FATz32), SEEK_SET);
+              fread(dir, 16, sizeof( struct DirectoryEntry), fptr);
+              break;
+            }
+          }
       }
     }
 
