@@ -165,10 +165,6 @@ int main()
     // \TODO Remove this code and replace with your FAT32 functionality
 
     int token_index  = 0;
-    for( token_index = 0; token_index < token_count; token_index ++ ) 
-    {
-      printf("token[%d] = %s\n", token_index, token[token_index] );  
-    }
 
     free( working_root );
 
@@ -266,20 +262,23 @@ int main()
     }
 
     else if(strcmp(token[0],"ls")==0){
+      int file_found = 0;
       if(is_the_file_open == 0){
         printf("Error: File system image must be opened first. \n");
       }else{
             for (int i = 0; i<16;i++){
-              if((dir[i].DIR_Attr == 0x001||(dir[i].DIR_Attr == 0x10)||(dir[i].DIR_Attr == 0x20))){
+               if((dir[i].DIR_Attr == 0x001||(dir[i].DIR_Attr == 0x10)||(dir[i].DIR_Attr == 0x20)) && 
+               ((dir[i].DIR_NAME[0] != '.') && (dir[i].DIR_NAME[0] != -27))){ // From pg 24
                 char input[12];
-                memset( input, 0, 12 );
+                memset( input, ' ', 12 );
                 strncpy( input ,dir[i].DIR_NAME, 11 );
                 input[11] ='\0'; //Inserting a null terminator
+                file_found = 1;
                 printf("Filename : %s \n",input);
               }
-              else{
-                printf("File not found \n");
-              }
+            }
+            if(file_found == 0){
+              printf("File not found \n");
             }
       }
     }
@@ -302,9 +301,7 @@ int main()
               fseek(fptr, LABToOffset( ClusterLow,BPB_BytesPerSec,BPB_RsvdSecCnt,BPB_NumFATs,BPB_FATz32), SEEK_SET);
               fread(dir, 16, sizeof( struct DirectoryEntry), fptr);
               break;
-            } else{
-              printf("File not found \n");
-            }
+            } 
           }
       }
     }
@@ -315,6 +312,7 @@ int main()
       }else{
         printf("Read is detected. \n");
       }
+     }
   } 
   return 0;
 }
