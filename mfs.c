@@ -269,15 +269,18 @@ int main()
       if(is_the_file_open == 0){
         printf("Error: File system image must be opened first. \n");
       }else{
-              for (int i = 0; i<16;i++){
-                if((dir[i].DIR_Attr == 0x001||(dir[i].DIR_Attr == 0x10)||(dir[i].DIR_Attr == 0x20))){
-                  char input[12];
-                  memset( input, 0, 12 );
-                  strncpy( input ,dir[i].DIR_NAME, 11 );
-                  input[11] ='\0'; //Inserting a null terminator
-                  printf("Filename : %s \n",input);
-                }
+            for (int i = 0; i<16;i++){
+              if((dir[i].DIR_Attr == 0x001||(dir[i].DIR_Attr == 0x10)||(dir[i].DIR_Attr == 0x20))){
+                char input[12];
+                memset( input, 0, 12 );
+                strncpy( input ,dir[i].DIR_NAME, 11 );
+                input[11] ='\0'; //Inserting a null terminator
+                printf("Filename : %s \n",input);
               }
+              else{
+                printf("File not found \n");
+              }
+            }
       }
     }
 
@@ -299,11 +302,19 @@ int main()
               fseek(fptr, LABToOffset( ClusterLow,BPB_BytesPerSec,BPB_RsvdSecCnt,BPB_NumFATs,BPB_FATz32), SEEK_SET);
               fread(dir, 16, sizeof( struct DirectoryEntry), fptr);
               break;
+            } else{
+              printf("File not found \n");
             }
           }
       }
     }
-
+    
+    else if(strcmp(token[0],"read") == 0){
+      if(is_the_file_open == 0){
+        printf("Error: File system image must be opened first. \n");
+      }else{
+        printf("Read is detected. \n");
+      }
   } 
   return 0;
 }
