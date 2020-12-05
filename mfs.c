@@ -33,6 +33,8 @@
 #include <string.h>
 #include <signal.h>
 #include <stdint.h>
+#include <string.h>
+#include <ctype.h>
 
 #define MAX_NUM_ARGUMENTS 3
 
@@ -73,7 +75,7 @@ int compare_Name(char * input2, char * IMG_Name){
   char expanded_name[12];
   memset(expanded_name, ' ',12); // Sets ' ' in all indexes
   char *token = strtok(input,".");
-  strncpy(expanded_name,token,stnlen(token));
+  strncpy(expanded_name,token,strnlen( token );
   token = strtok(NULL,".");
   token = strtok(NULL, ".");
   if (token){
