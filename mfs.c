@@ -264,6 +264,9 @@ int main()
       }
     }
 
+    else if(strcmp(token[0],"ls")==0){
+
+    }
     
   } 
   return 0;
