@@ -50,10 +50,11 @@ int main()
   FILE *fptr;
   
   // This are for bios parameter block (BPB)
-  uint8_t BPB_BytesPerSec; // Count of bytes per sector
-  uint8_t BPB_SecPerClus; // No. of sectors per allocation 
-  uint16_t BPB_NumFATs; // Count of FAT data strucutre in volume 
-  u_int8_t BPB_FATz32;  // FAT32 32-bit count of sectors occupied by One FAT
+  int16_t BPB_BytesPerSec; // Count of bytes per sector
+  int8_t BPB_SecPerClus; // No. of sectors per allocation 
+  int16_t BPB_NumFATs; // Count of FAT data strucutre in volume 
+  int8_t BPB_FATz32;  // FAT32 32-bit count of sectors occupied by One FAT
+  int8_t BPB_RsvdSecCnt; // Number of reserved sectors in the Reserved region of the volume 
 
   char * cmd_str = (char*) malloc( MAX_COMMAND_SIZE );
 
@@ -152,12 +153,15 @@ int main()
         fread((&BPB_NumFATs),1,1,fptr);
         fseek(fptr,36,SEEK_SET);
         fread((&BPB_FATz32),4,1,fptr);
+        fseek(fptr,14,SEEK_SET);
+        fread((&BPB_RsvdSecCnt),2,1,fptr);
 
         // Printing out the details [int and hexadecimal values]
         printf("Bytes per sector (BPB_BytesPerSec) : %d %x \n",BPB_BytesPerSec, BPB_BytesPerSec);
         printf("No of sectors per allocation (BPB_SecPerClus) : %d %x \n",BPB_SecPerClus, BPB_SecPerClus);
         printf("Count of FAT data structure on the volume (BPB_NumFATs) : %d %x \n",BPB_NumFATs, BPB_NumFATs);
         printf("Bit-count of sectors occupied by one fat (BPB_FATz32) : %d %x \n",BPB_FATz32, BPB_FATz32);
+        printf("Number of reserved sectors in the section (BPB_RsvdSecCnt): %d %x \n",BPB_RsvdSecCnt, BPB_RsvdSecCnt);
       }
     }
 
