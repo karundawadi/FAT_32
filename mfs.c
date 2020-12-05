@@ -43,7 +43,7 @@
 
 #define MAX_COMMAND_SIZE 255    // The maximum command-line size
 
-
+// Packed makes sure to size layout how it looks
 struct __attribute__((__packed__)) DirectoryEntry{
     char DIR_NAME[11]; // The name of the directory {Specs on the whitepaper document}
     uint8_t DIR_Attr; // The file attribute {Specs also on the sheet}
@@ -56,6 +56,37 @@ struct __attribute__((__packed__)) DirectoryEntry{
 
 struct DirectoryEntry dir[16]; // Since we can only have 16 of these represented by the fat
 
+// Functions defined here 
+int compare_Name(char * input2, char * IMG_Name){
+  char input[12];
+  memset(input,0,12); // Fills input with 0s
+  strncpy(input,input2,11);
+  if(strncpy(input,"..",2) == 0){
+    if (strncpy(input, IMG_Name,2) == 0){
+      return 1;
+    } else{
+      return 0;
+    }
+  }
+  char expanded_name[12];
+  memset(expanded_name, ' ',12); // Sets ' ' in all indexes
+  char *token = strtok(input,".");
+  strncpy(expanded_name,token,stnlen(token));
+  token = strtok(NULL,".");
+  token = strtok(NULL, ".");
+  if (token){
+    strncpy((char*)(expanded_name+8),token,strlen(token));
+  }
+  expanded_name[11] = '\0';
+  int i;
+  for (i=0;i<11;i++){
+    expanded_name[i] = toupper(expanded_name[i]);
+  }
+  if(strcmp(expanded_name,IMG_Name,11)==0){
+    return 1;
+  }
+  return 0;
+}
 
 int main()
 {
@@ -138,6 +169,28 @@ int main()
           }
           else{
             is_the_file_open = 1; // 1 means true
+
+            // Reading details about the file system 
+            // The details are taken from the hardware white paper 
+            fseek(fptr,11,SEEK_SET);
+            fread((&BPB_BytesPerSec),2,1,fptr);
+            fseek(fptr,13,SEEK_SET);
+            fread((&BPB_SecPerClus),1,1,fptr);
+            fseek(fptr,16,SEEK_SET);
+            fread((&BPB_NumFATs),1,1,fptr);
+            fseek(fptr,36,SEEK_SET);
+            fread((&BPB_FATz32),4,1,fptr);
+            fseek(fptr,14,SEEK_SET);
+            fread((&BPB_RsvdSecCnt),2,1,fptr);
+
+            // For the clusters 
+            int reserved_sector = BPB_RsvdSecCnt * BPB_BytesPerSec;
+            int totalFatSize = BPB_NumFATs * BPB_FATz32 * BPB_BytesPerSec;
+            int cluster_starts_at = reserved_sector + totalFatSize;
+            
+            // Reading to the DIR array 
+            fseek(fptr,cluster_starts_at,SEEK_SET);
+            fread(dir, 16, sizeof(struct DirectoryEntry), fptr);
           }
       } 
       else{
@@ -158,18 +211,6 @@ int main()
         printf("Error: File system not open \n");
       }
       else{
-        // The details are taken from the hardware white paper 
-        fseek(fptr,11,SEEK_SET);
-        fread((&BPB_BytesPerSec),2,1,fptr);
-        fseek(fptr,13,SEEK_SET);
-        fread((&BPB_SecPerClus),1,1,fptr);
-        fseek(fptr,16,SEEK_SET);
-        fread((&BPB_NumFATs),1,1,fptr);
-        fseek(fptr,36,SEEK_SET);
-        fread((&BPB_FATz32),4,1,fptr);
-        fseek(fptr,14,SEEK_SET);
-        fread((&BPB_RsvdSecCnt),2,1,fptr);
-
         // Printing out the details [int and hexadecimal values]
         printf("Bytes per sector (BPB_BytesPerSec) : %d %x \n",BPB_BytesPerSec, BPB_BytesPerSec);
         printf("No of sectors per allocation (BPB_SecPerClus) : %d %x \n",BPB_SecPerClus, BPB_SecPerClus);
@@ -184,6 +225,8 @@ int main()
       if(is_the_file_open == 0){
         printf("Error: File system not found \n");
       }else{
+        // Printing out details with caution 
+
 
       }
     }
