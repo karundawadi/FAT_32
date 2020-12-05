@@ -45,13 +45,13 @@
 
 
 struct __attribute__((__packed__)) DirectoryEntry{
-    char DIR_NAME[11]; // The name of the directory { Specs on the whitepaper document}
-    uint8_t DIR_Attr; 
-    uint8_t Unused1[8];
-    uint16_t DIR_FirstClusterHigh;
-    uint8_t Unused2[4];
-    uint16_t DIR_FirstCLusterLow;
-    uint32_t DIR_FileSize;
+    char DIR_NAME[11]; // The name of the directory {Specs on the whitepaper document}
+    uint8_t DIR_Attr; // The file attribute {Specs also on the sheet}
+    uint8_t Unused1[8]; // Skipped from DIR-NTRes to DIR_LastAccDate
+    uint16_t DIR_FirstClusterHigh; // High word of this entry's first cluster 
+    uint8_t Unused2[4]; // FstClusHI ignored
+    uint16_t DIR_FirstCLusterLow; // Low word of the entry's first cluster member
+    uint32_t DIR_FileSize; // 32-bit word holding the file size in bytes
 };
 
 struct DirectoryEntry dir[16]; // Since we can only have 16 of these represented by the fat
