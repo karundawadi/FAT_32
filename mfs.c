@@ -110,6 +110,7 @@ int main()
   // Variables used in the program 
   int is_the_file_open= 0; // 1 means file is open
   FILE *fptr;
+  int offset_of_current_working_dir = 0;
   
   // This are for bios parameter block (BPB)
   int16_t BPB_BytesPerSec; // Count of bytes per sector
@@ -277,6 +278,14 @@ int main()
                   printf("Filename : %s \n",input);
                 }
               }
+      }
+    }
+
+    else if(strcmp(token[0],"cd")==0){
+      if(is_the_file_open == 0){
+        printf("Error: File system image must be opened first. \n");
+      }else{
+
       }
     }
 
