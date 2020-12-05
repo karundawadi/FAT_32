@@ -61,37 +61,45 @@ struct DirectoryEntry dir[16]; // Since we can only have 16 of these represented
 // Functions defined here 
 
 // From professor's github code, compares FOO TXT and foo.txt in short
-int compare_Name(char * input2, char * IMG_Name){
-  char input[12];
-  memset(input,0,12); // Fills input with 0s
-  strncpy(input,input2,11);
-  if(strncpy(input,"..",2) == 0){
-    if (strncpy(input, IMG_Name,2) == 0){
-      return 1;
-    } else{
-      return 0;
+int compare_Name( char * input2, char * IMG_Name )
+  {
+    char input[12];
+    memset( input, 0, 12 );
+    strncpy( input ,input2, 11 );
+    //printf("comparing %s %s\n", input, IMG_Name );
+    if( strncmp( input, "..", 2 ) == 0)
+    {
+      if( strncmp( input, IMG_Name, 2 ) == 0)
+      {
+        return 1;
+      }
+      else
+      {
+        return 0;
+      }
     }
+    char expanded_name[12];
+    memset( expanded_name, ' ', 12 );
+    char *token = strtok( input, "." );
+    strncpy( expanded_name, token, strlen( token ) );
+    token = strtok( NULL, "." );
+    if( token )
+    {
+      strncpy( (char*)(expanded_name+8), token, strlen(token ) );
+    }
+    expanded_name[11] = '\0';
+    int i;
+    for( i = 0; i < 11; i++ )
+    {
+      expanded_name[i] = toupper( expanded_name[i] );
+    }
+    if( strncmp( expanded_name, IMG_Name, 11 ) == 0 )
+    {
+      return 1;
+    }
+    return 0;
   }
-  char expanded_name[12];
-  memset(expanded_name, ' ',12); // Sets ' ' in all indexes
-  char *token = strtok(input,".");
-  strncpy(expanded_name,token,strnlen( token );
-  token = strtok(NULL,".");
-  token = strtok(NULL, ".");
-  if (token){
-    strncpy((char*)(expanded_name+8),token,strlen(token));
-  }
-  expanded_name[11] = '\0';
-  int i;
-  for (i=0;i<11;i++){
-    expanded_name[i] = toupper(expanded_name[i]);
-  }
-  if(strcmp(expanded_name,IMG_Name,11)==0){
-    return 1;
-  }
-  return 0;
-}
-
+  
 // Finds the starting address of a block of data given the sector number 
 int LABToOffset(int32_t sector, int16_t BPB_BytesPerSec, int16_t BPB_RsvdSecCnt, int8_t BPB_NumFATs, int32_t BPB_FATz32){
   return ((sector-2)* BPB_BytesPerSec+ (BPB_BytesPerSec* BPB_RsvdSecCnt)+(BPB_NumFATs*BPB_FATz32*BPB_BytesPerSec));
