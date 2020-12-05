@@ -57,6 +57,8 @@ struct __attribute__((__packed__)) DirectoryEntry{
 struct DirectoryEntry dir[16]; // Since we can only have 16 of these represented by the fat
 
 // Functions defined here 
+
+// From professor's github code, compares FOO TXT and foo.txt in short
 int compare_Name(char * input2, char * IMG_Name){
   char input[12];
   memset(input,0,12); // Fills input with 0s
@@ -86,6 +88,11 @@ int compare_Name(char * input2, char * IMG_Name){
     return 1;
   }
   return 0;
+}
+
+// Finds the starting address of a block of data given the sector number 
+int LABToOffset(int32_t sector, int16_t BPB_BytesPerSec, int16_t BPB_RsvdSecCnt, int8_t BPB_NumFATs, int32_t BPB_FATz32){
+  return ((sector-2)* BPB_BytesPerSec+ (BPB_BytesPerSec* BPB_RsvdSecCnt)+(BPB_NumFATs*BPB_FATz32*BPB_BytesPerSec));
 }
 
 int main()
@@ -226,7 +233,6 @@ int main()
         printf("Error: File system not found \n");
       }else{
         // Printing out details with caution 
-
 
       }
     }
