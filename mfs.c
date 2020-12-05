@@ -105,6 +105,14 @@ int LABToOffset(int32_t sector, int16_t BPB_BytesPerSec, int16_t BPB_RsvdSecCnt,
   return ((sector-2)* BPB_BytesPerSec+ (BPB_BytesPerSec* BPB_RsvdSecCnt)+(BPB_NumFATs*BPB_FATz32*BPB_BytesPerSec));
 }
 
+int16_t NEXTLB(uint32_t sector, FILE *fptr, int16_t BPB_BytesPerSec, int16_t BPB_RsvdSecCnt, int8_t BPB_NumFATs, int32_t BPB_FATz32){
+  uint32_t FATAddress = (BPB_BytesPerSec * BPB_RsvdSecCnt) + (sector * 4);
+  int16_t val;
+  fseek(fptr,FATAddress,SEEK_SET);
+  fread(&val,2,1,fptr);
+  return val;
+}
+
 int main()
 {
   // Variables used in the program 
