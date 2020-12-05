@@ -99,7 +99,7 @@ int compare_Name( char * input2, char * IMG_Name )
     }
     return 0;
   }
-  
+
 // Finds the starting address of a block of data given the sector number 
 int LABToOffset(int32_t sector, int16_t BPB_BytesPerSec, int16_t BPB_RsvdSecCnt, int8_t BPB_NumFATs, int32_t BPB_FATz32){
   return ((sector-2)* BPB_BytesPerSec+ (BPB_BytesPerSec* BPB_RsvdSecCnt)+(BPB_NumFATs*BPB_FATz32*BPB_BytesPerSec));
@@ -243,9 +243,28 @@ int main()
         printf("Error: File system not found \n");
       }else{
         // Printing out details with caution 
-
+        int i = 0;
+        for (i = 0;i<16;i++){
+          if(compare_Name(token[1],dir[i].DIR_NAME)){
+            // In case it is a directory 
+            if(dir[i].DIR_FileSize == 0){
+              // The entered value if a directory
+              printf("The entered value : %s is a directory. \n", token[1]);
+              printf("The cluster number is %d and the arributed are %d \n", dir[i].DIR_FirstCLusterLow, dir[i].DIR_Attr); 
+              // The above statement means that data starts at first cluster low
+            }else{
+              printf("The entered value : %s is a file. \n", token[1]);
+              printf("The cluster number is %d and the arributed are %d \n", dir[i].DIR_FirstCLusterLow, dir[i].DIR_Attr); 
+            }
+          }
+          else{
+            printf("Error : File not found \n");
+          }
+        }
       }
     }
+
+    
   } 
   return 0;
 }
