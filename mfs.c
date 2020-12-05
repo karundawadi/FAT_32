@@ -43,6 +43,20 @@
 
 #define MAX_COMMAND_SIZE 255    // The maximum command-line size
 
+
+struct __attribute__((__packed__)) DirectoryEntry{
+    char DIR_NAME[11]; // The name of the directory { Specs on the whitepaper document}
+    uint8_t DIR_Attr; 
+    uint8_t Unused1[8];
+    uint16_t DIR_FirstClusterHigh;
+    uint8_t Unused2[4];
+    uint16_t DIR_FirstCLusterLow;
+    uint32_t DIR_FileSize;
+};
+
+struct DirectoryEntry dir[16]; // Since we can only have 16 of these represented by the fat
+
+
 int main()
 {
   // Variables used in the program 
@@ -52,9 +66,9 @@ int main()
   // This are for bios parameter block (BPB)
   int16_t BPB_BytesPerSec; // Count of bytes per sector
   int8_t BPB_SecPerClus; // No. of sectors per allocation 
-  int16_t BPB_NumFATs; // Count of FAT data strucutre in volume 
-  int8_t BPB_FATz32;  // FAT32 32-bit count of sectors occupied by One FAT
-  int8_t BPB_RsvdSecCnt; // Number of reserved sectors in the Reserved region of the volume 
+  int8_t BPB_NumFATs; // Count of FAT data strucutre in volume 
+  int32_t BPB_FATz32;  // FAT32 32-bit count of sectors occupied by One FAT
+  int16_t BPB_RsvdSecCnt; // Number of reserved sectors in the Reserved region of the volume 
 
   char * cmd_str = (char*) malloc( MAX_COMMAND_SIZE );
 
@@ -167,7 +181,11 @@ int main()
 
     else if (strcmp(token[0],"stat")==0){
       // Filaname or directory name is token[1]
-      
+      if(is_the_file_open == 0){
+        printf("Error: File system not found \n");
+      }else{
+
+      }
     }
   } 
   return 0;
