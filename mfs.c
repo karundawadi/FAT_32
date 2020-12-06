@@ -254,11 +254,13 @@ int main()
             if(dir[i].DIR_FileSize == 0){
               // The entered value if a directory
               printf("The entered value : %s is a directory. \n", token[1]);
-              printf("The cluster number is %d and the arributed are %d \n", dir[i].DIR_FirstCLusterLow, dir[i].DIR_Attr); 
+              printf("The cluster number is %d and the arributed are %d \n", dir[i].DIR_FirstCLusterLow, dir[i].DIR_Attr);
+              printf("The file size is %d and the arributed are %d \n", dir[i].DIR_FileSize, dir[i].DIR_FileSize); 
               // The above statement means that data starts at first cluster low
             }else{
               printf("The entered value : %s is a file. \n", token[1]);
               printf("The cluster number is %d and the arributed are %d \n", dir[i].DIR_FirstCLusterLow, dir[i].DIR_Attr); 
+              printf("The file size is %d and the arributed are %d \n", dir[i].DIR_FileSize, dir[i].DIR_FileSize); 
             }
           }
           else{
@@ -315,6 +317,7 @@ int main()
       }
     }
     
+    // Need some minor changes
     else if(strcmp(token[0],"read") == 0){
       if(is_the_file_open == 0){
         printf("Error: File system image must be opened first. \n");
@@ -333,6 +336,7 @@ int main()
             printf("%s \n",dir[i].DIR_NAME);
             int actual_position_to_print_from = dir[i].DIR_FirstCLusterLow;
             found_position = LABToOffset(actual_position_to_print_from,BPB_BytesPerSec,BPB_RsvdSecCnt,BPB_NumFATs,BPB_FATz32);
+            printf("Found position : %d \n",found_position);
             fseek(fptr,found_position + position,SEEK_SET);
             fread(&characters,number_of_bytes_from_position,1,fptr);
             for(int k = 0; k<number_of_bytes_from_position;k++){
