@@ -329,10 +329,8 @@ int main()
         for(int i = 0;i<16;i++){
           if(compare_Name(fileName,dir[i].DIR_NAME)){
             // This means we got the match in which we need to go number_of_bytes_from_position
-            printf("%s \n",dir[i].DIR_NAME);
             int actual_position_to_print_from = dir[i].DIR_FirstCLusterLow;
             found_position = LABToOffset(actual_position_to_print_from,BPB_BytesPerSec,BPB_RsvdSecCnt,BPB_NumFATs,BPB_FATz32);
-            printf("Found position : %d \n",found_position);
             fseek(fptr,found_position + position,SEEK_SET);
             fread(&buffer,number_of_bytes_from_position,1,fptr);
             printf("%s \n",buffer);
@@ -349,37 +347,37 @@ int main()
           int i = 0;
           int file_found = 0;
           for (i = 0; i<16 ; i++){
-              if(compare_Name(token[1],dir[i].DIR_NAME)){
-              file_found = 1;
-              int cluster = dir[i].DIR_FirstCLusterLow;
-              int size = dir[i].DIR_FileSize;
-              FILE *ofp;
-              if(token[2] == NULL){
-                ofp = fopen(token[1], "w");
-              }else{
-                ofp = fopen(token[2],"w");
-                printf("Opening the new file");
-              }
-              while(size>-512){
-                uint8_t buffer[512];
-                int offset = LABToOffset(cluster,BPB_BytesPerSec,BPB_RsvdSecCnt,BPB_NumFATs,BPB_FATz32);
-                fseek(fptr,offset,SEEK_SET);
-                fread(buffer,1,512,fptr); // Since buffer can take any value
-                fwrite(buffer,1,512,ofp);
-                size = size - 512;
-                cluster = NextLB(cluster,fptr,BPB_BytesPerSec,BPB_RsvdSecCnt,BPB_NumFATs,BPB_FATz32);
-              }
-              if(size){
-                if(cluster != -1){
+                if(compare_Name(token[1],dir[i].DIR_NAME)){
+                file_found = 1;
+                int cluster = dir[i].DIR_FirstCLusterLow;
+                int size = dir[i].DIR_FileSize;
+                FILE *ofp;
+                if(token[2] == NULL){
+                  ofp = fopen(token[1], "w");
+                }else{
+                  ofp = fopen(token[2],"w");
+                  printf("Opening the new file");
+                }
+                while(size>-512){
                   uint8_t buffer[512];
                   int offset = LABToOffset(cluster,BPB_BytesPerSec,BPB_RsvdSecCnt,BPB_NumFATs,BPB_FATz32);
                   fseek(fptr,offset,SEEK_SET);
-                  fread(buffer,1,size,fptr);
-                  fwrite(buffer,1,size,ofp);
+                  fread(buffer,1,512,fptr); // Since buffer can take any value
+                  fwrite(buffer,1,512,ofp);
+                  size = size - 512;
+                  cluster = NextLB(cluster,fptr,BPB_BytesPerSec,BPB_RsvdSecCnt,BPB_NumFATs,BPB_FATz32);
                 }
+                if(size){
+                  if(cluster != -1){
+                    uint8_t buffer[512];
+                    int offset = LABToOffset(cluster,BPB_BytesPerSec,BPB_RsvdSecCnt,BPB_NumFATs,BPB_FATz32);
+                    fseek(fptr,offset,SEEK_SET);
+                    fread(buffer,1,size,fptr);
+                    fwrite(buffer,1,size,ofp);
+                  }
+                }
+                fclose(ofp);
               }
-              fclose(ofp);
-            }
           }
           if(file_found == 0){
             printf("Error: File not found");
