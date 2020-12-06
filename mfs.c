@@ -36,7 +36,7 @@
 #include <string.h>
 #include <ctype.h>
 
-#define MAX_NUM_ARGUMENTS 3
+#define MAX_NUM_ARGUMENTS 4
 
 #define WHITESPACE " \t\n"      // We want to split our command line up into tokens
                                 // so we need to define what delimits our tokens.
@@ -105,7 +105,7 @@ int LABToOffset(int32_t sector, int16_t BPB_BytesPerSec, int16_t BPB_RsvdSecCnt,
   return ((sector-2)* BPB_BytesPerSec+ (BPB_BytesPerSec* BPB_RsvdSecCnt)+(BPB_NumFATs*BPB_FATz32*BPB_BytesPerSec));
 }
 
-int16_t NEXTLB(uint32_t sector, FILE *fptr, int16_t BPB_BytesPerSec, int16_t BPB_RsvdSecCnt, int8_t BPB_NumFATs, int32_t BPB_FATz32){
+int16_t NextLB(uint32_t sector, FILE *fptr, int16_t BPB_BytesPerSec, int16_t BPB_RsvdSecCnt, int8_t BPB_NumFATs, int32_t BPB_FATz32){
   uint32_t FATAddress = (BPB_BytesPerSec * BPB_RsvdSecCnt) + (sector * 4);
   int16_t val;
   fseek(fptr,FATAddress,SEEK_SET);
@@ -168,13 +168,12 @@ int main()
       }
         token_count++;
     }
-
-    // Now print the tokenized input as a debug check
-    // \TODO Remove this code and replace with your FAT32 functionality
-
     int token_index  = 0;
-
-    free( working_root );
+    // Now print the tokenized input as a debug check
+     for( token_index = 0; token_index < token_count; token_index ++ ) 
+    {
+      printf("token[%d] = %s\n", token_index, token[token_index] );  
+    }
 
     // At this point token[0] and token[1] and so on has the details about the user input 
 
@@ -318,10 +317,29 @@ int main()
       if(is_the_file_open == 0){
         printf("Error: File system image must be opened first. \n");
       }else{
-        printf("Read is detected. \n");
-        // Ls and cd are workimg. 
+        char fileName[100];
+        int position; 
+        int number_of_bytes_from_position;
+        strcpy(fileName,token[1]);
+        printf("%s \n",fileName);
+        position = atoi(token[2]);
+        printf("%d \n",position);
+        printf("%s \n",token[3]);
+        number_of_bytes_from_position = atoi(token[3]);
+        printf("%d \n",number_of_bytes_from_position);
+        // for(int i = 0;i<16;i++){
+        //   if(compare_Name(fileName,dir[i].DIR_NAME)){
+        //     // This means we got the match in which we need to go number_of_bytes_from_position
+        //     int actual_position_to_print_from = dir[i].DIR_FirstCLusterLow + position;
+        //     int16_t index = NextLB(actual_position_to_print_from,fptr,BPB_BytesPerSec,BPB_RsvdSecCnt,BPB_NumFATs,BPB_FATz32);
+        //     int offset_required = LABToOffset(index,BPB_BytesPerSec,BPB_RsvdSecCnt,BPB_NumFATs,BPB_FATz32);
+        //     printf("%d \n",offset_required);
+        //   }
+        // }
       }
      }
+
+    free( working_root );
   } 
   return 0;
 }
