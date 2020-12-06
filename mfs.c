@@ -102,7 +102,7 @@ int compare_Name( char * input2, char * IMG_Name )
 
 // Finds the starting address of a block of data given the sector number 
 int LABToOffset(int32_t sector, int16_t BPB_BytesPerSec, int16_t BPB_RsvdSecCnt, int8_t BPB_NumFATs, int32_t BPB_FATz32){
-  return ((sector-2)* BPB_BytesPerSec+ (BPB_BytesPerSec* BPB_RsvdSecCnt)+(BPB_NumFATs*BPB_FATz32*BPB_BytesPerSec));
+  return ((sector-2)* BPB_BytesPerSec) + (BPB_BytesPerSec* BPB_RsvdSecCnt)+(BPB_NumFATs*BPB_FATz32*BPB_BytesPerSec);
 }
 
 int16_t NextLB(uint32_t sector, FILE *fptr, int16_t BPB_BytesPerSec, int16_t BPB_RsvdSecCnt, int8_t BPB_NumFATs, int32_t BPB_FATz32){
@@ -281,7 +281,7 @@ int main()
                 strncpy( input ,dir[i].DIR_NAME, 11 );
                 input[11] ='\0'; //Inserting a null terminator
                 file_found = 1;
-                printf("Filename : %s \n",input);
+                printf("%s \n",input);
               }
             }
             if(file_found == 0){
@@ -303,8 +303,10 @@ int main()
             if(compare_Name( token[1], dir[i].DIR_NAME))
             {
               ClusterLow = dir[i].DIR_FirstCLusterLow;
-              if( ClusterLow == 0 ) ClusterLow = 2;
-              printf("Moving to cluster %d\n", ClusterLow);
+              if( ClusterLow == 0 ) {
+                ClusterLow = 2;
+                printf("You are in root directory can not go further back. \n");
+              }
               fseek(fptr, LABToOffset( ClusterLow,BPB_BytesPerSec,BPB_RsvdSecCnt,BPB_NumFATs,BPB_FATz32), SEEK_SET);
               fread(dir, 16, sizeof( struct DirectoryEntry), fptr);
               break;
@@ -320,22 +322,25 @@ int main()
         char fileName[100];
         int position; 
         int number_of_bytes_from_position;
+        int found_position;
         strcpy(fileName,token[1]);
-        printf("%s \n",fileName);
         position = atoi(token[2]);
-        printf("%d \n",position);
-        printf("%s \n",token[3]);
         number_of_bytes_from_position = atoi(token[3]);
-        printf("%d \n",number_of_bytes_from_position);
-        // for(int i = 0;i<16;i++){
-        //   if(compare_Name(fileName,dir[i].DIR_NAME)){
-        //     // This means we got the match in which we need to go number_of_bytes_from_position
-        //     int actual_position_to_print_from = dir[i].DIR_FirstCLusterLow + position;
-        //     int16_t index = NextLB(actual_position_to_print_from,fptr,BPB_BytesPerSec,BPB_RsvdSecCnt,BPB_NumFATs,BPB_FATz32);
-        //     int offset_required = LABToOffset(index,BPB_BytesPerSec,BPB_RsvdSecCnt,BPB_NumFATs,BPB_FATz32);
-        //     printf("%d \n",offset_required);
-        //   }
-        // }
+        char characters[number_of_bytes_from_position]; // Is an unsigned int so we can print hex value
+        for(int i = 0;i<16;i++){
+          if(compare_Name(fileName,dir[i].DIR_NAME)){
+            // This means we got the match in which we need to go number_of_bytes_from_position
+            printf("%s \n",dir[i].DIR_NAME);
+            int actual_position_to_print_from = dir[i].DIR_FirstCLusterLow;
+            found_position = LABToOffset(actual_position_to_print_from,BPB_BytesPerSec,BPB_RsvdSecCnt,BPB_NumFATs,BPB_FATz32);
+            fseek(fptr,found_position + position,SEEK_SET);
+            fread(&characters,number_of_bytes_from_position,1,fptr);
+            for(int k = 0; k<number_of_bytes_from_position;k++){
+              printf("%c",characters[k]);
+            }
+            printf("\n");
+          }
+        }
       }
      }
 
