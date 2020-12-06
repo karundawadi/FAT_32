@@ -361,7 +361,7 @@ int main()
                     ofp = fopen(token[1], "w");
                   }else{
                     ofp = fopen(token[2],"w");
-                    printf("Opening the new file");
+                    printf("Opening the new file \n");
                   }
                   while(size>=512){
                     uint8_t buffer[512];
