@@ -229,11 +229,11 @@ int main()
       }
       else{
         // Printing out the details [int and hexadecimal values]
-        printf("Bytes per sector (BPB_BytesPerSec) : %d %x \n",BPB_BytesPerSec, BPB_BytesPerSec);
-        printf("No of sectors per allocation (BPB_SecPerClus) : %d %x \n",BPB_SecPerClus, BPB_SecPerClus);
-        printf("Count of FAT data structure on the volume (BPB_NumFATs) : %d %x \n",BPB_NumFATs, BPB_NumFATs);
-        printf("Bit-count of sectors occupied by one fat (BPB_FATz32) : %d %x \n",BPB_FATz32, BPB_FATz32);
-        printf("Number of reserved sectors in the section (BPB_RsvdSecCnt): %d %x \n",BPB_RsvdSecCnt, BPB_RsvdSecCnt);
+        printf("BPB_BytesPerSec : %d \n BPB_BytesPerSec : %x \n",BPB_BytesPerSec, BPB_BytesPerSec);
+        printf("BPB_SecPerClus : %d \n BPB_SecPerClus : %x \n",BPB_SecPerClus, BPB_SecPerClus);
+        printf("BPB_NumFATs : %d \n BPB_NumFATs : %x \n",BPB_NumFATs, BPB_NumFATs);
+        printf("BPB_FATz32 : %d \n BPB_FATz32 : %x \n",BPB_FATz32, BPB_FATz32);
+        printf("BPB_RsvdSecCnt: %d \n BPB_RsvdSecCnt: %x \n",BPB_RsvdSecCnt, BPB_RsvdSecCnt);
       }
     }
 
@@ -324,6 +324,7 @@ int main()
         strcpy(fileName,token[1]);
         position = atoi(token[2]);
         number_of_bytes_from_position = atoi(token[3]);
+        uint8_t buffer[number_of_bytes_from_position];
         unsigned char characters[number_of_bytes_from_position]; // Is an unsigned int so we can print hex value
         for(int i = 0;i<16;i++){
           if(compare_Name(fileName,dir[i].DIR_NAME)){
@@ -333,10 +334,8 @@ int main()
             found_position = LABToOffset(actual_position_to_print_from,BPB_BytesPerSec,BPB_RsvdSecCnt,BPB_NumFATs,BPB_FATz32);
             printf("Found position : %d \n",found_position);
             fseek(fptr,found_position + position,SEEK_SET);
-            fread(&characters,number_of_bytes_from_position,1,fptr);
-            for(int k = 0; k<number_of_bytes_from_position;k++){
-              printf("%c",characters[k]);
-            }
+            fread(&buffer,number_of_bytes_from_position,1,fptr);
+            printf("%s \n",buffer);
             printf("\n");
           }
         }
