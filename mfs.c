@@ -20,8 +20,11 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-// Karun Dawadi 
-// Prajwal Rana 
+/*
+Group members: 
+1) Karun Dawadi 
+2) Prajwal Rana 
+*/
 
 #define _GNU_SOURCE
 
@@ -169,13 +172,6 @@ int main()
         token_count++;
     }
     int token_index  = 0;
-    // Now print the tokenized input as a debug check
-     for( token_index = 0; token_index < token_count; token_index ++ ) 
-    {
-      printf("token[%d] = %s\n", token_index, token[token_index] );  
-    }
-
-    // At this point token[0] and token[1] and so on has the details about the user input 
 
     // If the user enters exit or quit then we quit the program 
     if ((strcmp(token[0],"quit") == 0) || (strcmp(token[0],"exit") == 0)){
