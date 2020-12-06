@@ -363,6 +363,7 @@ int main()
                 ofp = fopen(token[1], "w");
               }else{
                 ofp = fopen(token[2],"w");
+                printf("Opening the new file");
               }
               while(size>-512){
                 uint8_t buffer[512];
@@ -389,6 +390,10 @@ int main()
             printf("Error: File not found");
           }
       }
+    }
+
+    else{
+      printf("Command not found \n");
     }
 
     free( working_root );
