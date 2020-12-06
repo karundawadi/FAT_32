@@ -319,6 +319,7 @@ int main()
         printf("Error: File system image must be opened first. \n");
       }else{
         printf("Read is detected. \n");
+        // Ls and cd are workimg. 
       }
      }
   } 
