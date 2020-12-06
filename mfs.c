@@ -315,8 +315,7 @@ int main()
             } 
           }
       }
-    }
-    
+    } 
     // Need some minor changes
     else if(strcmp(token[0],"read") == 0){
       if(is_the_file_open == 0){
@@ -329,7 +328,7 @@ int main()
         strcpy(fileName,token[1]);
         position = atoi(token[2]);
         number_of_bytes_from_position = atoi(token[3]);
-        char characters[number_of_bytes_from_position]; // Is an unsigned int so we can print hex value
+        unsigned char characters[number_of_bytes_from_position]; // Is an unsigned int so we can print hex value
         for(int i = 0;i<16;i++){
           if(compare_Name(fileName,dir[i].DIR_NAME)){
             // This means we got the match in which we need to go number_of_bytes_from_position
@@ -347,6 +346,50 @@ int main()
         }
       }
      }
+    
+    else if(strcmp(token[0],"get") == 0){
+      if(is_the_file_open == 0){
+        printf("Error: File system image must be opened first. \n");
+      }else{
+          int i = 0;
+          int file_found = 0;
+          for (i = 0; i<16 ; i++){
+              if(compare_Name(token[1],dir[i].DIR_NAME)){
+              file_found = 1;
+              int cluster = dir[i].DIR_FirstCLusterLow;
+              int size = dir[i].DIR_FileSize;
+              FILE *ofp;
+              if(token[2] == NULL){
+                ofp = fopen(token[1], "w");
+              }else{
+                ofp = fopen(token[2],"w");
+              }
+              while(size>-512){
+                uint8_t buffer[512];
+                int offset = LABToOffset(cluster,BPB_BytesPerSec,BPB_RsvdSecCnt,BPB_NumFATs,BPB_FATz32);
+                fseek(fptr,offset,SEEK_SET);
+                fread(buffer,1,512,fptr); // Since buffer can take any value
+                fwrite(buffer,1,512,ofp);
+                size = size - 512;
+                cluster = NextLB(cluster,fptr,BPB_BytesPerSec,BPB_RsvdSecCnt,BPB_NumFATs,BPB_FATz32);
+              }
+              if(size){
+                if(cluster != -1){
+                  uint8_t buffer[512];
+                  int offset = LABToOffset(cluster,BPB_BytesPerSec,BPB_RsvdSecCnt,BPB_NumFATs,BPB_FATz32);
+                  fseek(fptr,offset,SEEK_SET);
+                  fread(buffer,1,size,fptr);
+                  fwrite(buffer,1,size,ofp);
+                }
+              }
+              fclose(ofp);
+            }
+          }
+          if(file_found == 0){
+            printf("Error: File not found");
+          }
+      }
+    }
 
     free( working_root );
   } 
