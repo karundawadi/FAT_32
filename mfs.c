@@ -323,20 +323,52 @@ int main()
         int found_position;
         int file_found = 0;
         strcpy(fileName,token[1]);
-        position = atoi(token[2]);
-        number_of_bytes_from_position = atoi(token[3]);
-        uint8_t buffer[number_of_bytes_from_position];
-        unsigned char characters[number_of_bytes_from_position]; // Is an unsigned int so we can print hex value
+        position = atoi(token[2]);  // Requested offset
+        number_of_bytes_from_position = atoi(token[3]); // Requested bytes
+        int bytes_remaining_to_read = number_of_bytes_from_position;  
         for(int i = 0;i<16;i++){
           if(compare_Name(fileName,dir[i].DIR_NAME)){
             // This means we got the match in which we need to go number_of_bytes_from_position
             file_found = 1;
-            int actual_position_to_print_from = dir[i].DIR_FirstCLusterLow;
-            found_position = LABToOffset(actual_position_to_print_from,BPB_BytesPerSec,BPB_RsvdSecCnt,BPB_NumFATs,BPB_FATz32);
-            fseek(fptr,found_position + position,SEEK_SET);
-            fread(&buffer,number_of_bytes_from_position,1,fptr);
-            printf("%s \n",buffer);
-            printf("\n");
+            int cluster = dir[i].DIR_FirstCLusterLow;
+            int search_size = position;
+
+            while(search_size >= BPB_BytesPerSec){
+              cluster = NextLB(cluster,fptr,BPB_BytesPerSec,BPB_RsvdSecCnt,BPB_NumFATs,BPB_FATz32);
+              search_size = search_size - BPB_BytesPerSec;
+            }
+            int offset = LABToOffset(cluster,BPB_BytesPerSec,BPB_RsvdSecCnt,BPB_NumFATs,BPB_FATz32);
+            int byte_Off_Set = (position % BPB_BytesPerSec);
+            fseek(fptr,offset + byte_Off_Set,SEEK_SET);
+            unsigned char characters[BPB_BytesPerSec]; // Is an unsigned int so we can print hex value
+            int firstBlockBytes = BPB_BytesPerSec - number_of_bytes_from_position;
+            unsigned char buffer[BPB_BytesPerSec];
+            fread(buffer,1,firstBlockBytes,fptr);
+            int n =0;
+            for(n = 0; n <firstBlockBytes;n++){
+                printf("%x ",buffer[n]);              
+            }
+            bytes_remaining_to_read = bytes_remaining_to_read - firstBlockBytes;
+            while (  bytes_remaining_to_read >= 512){
+              cluster = NextLB(cluster,fptr,BPB_BytesPerSec,BPB_RsvdSecCnt,BPB_NumFATs,BPB_FATz32);
+              offset = LABToOffset(cluster,BPB_BytesPerSec,BPB_RsvdSecCnt,BPB_NumFATs,BPB_FATz32);
+              fseek( fptr,offset,SEEK_SET);
+              fread(buffer,1,BPB_BytesPerSec,fptr);
+              for(n = 0; n <firstBlockBytes;n++){
+                printf("%x ",buffer[n]);              
+              }
+              bytes_remaining_to_read = bytes_remaining_to_read - BPB_BytesPerSec;
+              if (bytes_remaining_to_read){
+                  cluster = NextLB(cluster,fptr,BPB_BytesPerSec,BPB_RsvdSecCnt,BPB_NumFATs,BPB_FATz32);
+                  offset = LABToOffset(cluster,BPB_BytesPerSec,BPB_RsvdSecCnt,BPB_NumFATs,BPB_FATz32);
+                  fseek( fptr,offset,SEEK_SET);
+                  fread(buffer,1,BPB_BytesPerSec,fptr);
+                  for(n = 0; n <firstBlockBytes;n++){
+                    printf("%x ",buffer[n]);              
+                  }
+              }
+              printf("\n");
+            }
           }
         }
         if(file_found == 0){
